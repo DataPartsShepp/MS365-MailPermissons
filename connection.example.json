@@ -1,0 +1,7 @@
+{
+  "TenantId": "your-tenant-id.onmicrosoft.com",
+  "AppId": "your-app-registration-client-id",
+  "AppSecret": "your-app-secret",
+  "UseCertificate": false,
+  "CertificateThumbprint": null
+}
