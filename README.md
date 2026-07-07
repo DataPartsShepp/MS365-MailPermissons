@@ -6,6 +6,8 @@ This repository contains a PowerShell script to connect to Microsoft 365 via app
 
 - `Get-MailboxPermissionReport.ps1` - main script
 - `connection.json` - sample app-only connection configuration
+- `connection.example.json` - generic example configuration
+- `connection.certificate.example.json` - certificate-based configuration example
 - `emails.txt` - sample mailbox list
 
 ## Prerequisites
@@ -38,7 +40,7 @@ Admin consent must be granted for the permission so the script can authenticate 
 
 ## Configuration
 
-Create or update `connection.json` with your tenant and app credentials:
+Create or update `connection.json` with your tenant and app credentials. For certificate auth, use the dedicated example file `connection.certificate.example.json`.
 
 ```json
 {
