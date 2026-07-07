@@ -5,10 +5,12 @@ This repository contains a PowerShell script to connect to Microsoft 365 via app
 ## Files
 
 - `Get-MailboxPermissionReport.ps1` - main script
-- `connection.json` - sample app-only connection configuration
+- `connection.json` - local app-only connection configuration (do not commit)
 - `connection.example.json` - generic example configuration
 - `connection.certificate.example.json` - certificate-based configuration example
 - `emails.txt` - sample mailbox list
+
+> `connection.json` and `emails.txt` are ignored by `.gitignore` to avoid committing secrets and local data.
 
 ## Prerequisites
 
@@ -53,6 +55,8 @@ Create or update `connection.json` with your tenant and app credentials. For cer
 ```
 
 This example uses certificate auth, which is the recommended method for current ExchangeOnlineManagement module versions.
+
+> Important: `connection.json` contains sensitive credentials and should remain local. Do not commit `connection.json` to source control.
 
 ### Finding your certificate thumbprint
 
