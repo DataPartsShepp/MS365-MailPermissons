@@ -58,9 +58,64 @@ This example uses certificate auth, which is the recommended method for current 
 
 > Important: `connection.json` contains sensitive credentials and should remain local. Do not commit `connection.json` to source control.
 
-### Finding your certificate thumbprint
+## Certificate setup
 
-Use the Windows certificate manager or PowerShell to locate the cert thumbprint:
+If you do not already have a certificate uploaded to your Azure AD app registration, create one and upload its public key.
+
+### 1. Create a certificate locally
+
+Run the following in PowerShell to create a self-signed certificate in your CurrentUser store:
+
+```powershell
+$cert = New-SelfSignedCertificate \
+  -Subject "CN=MS365-MailPermissions" \
+  -CertStoreLocation Cert:\CurrentUser\My \
+  -KeyExportPolicy Exportable \
+  -KeySpec Signature \
+  -Provider "Microsoft Software Key Storage Provider" \
+  -NotAfter (Get-Date).AddYears(2)
+
+Export-Certificate -Cert $cert -FilePath .\MS365-MailPermissions.cer
+```
+
+This creates a certificate with a private key in `Cert:\CurrentUser\My` and exports the public certificate to `MS365-MailPermissions.cer`.
+
+### 2. Upload the certificate to your Azure AD app
+
+1. Open the Azure portal and go to `Azure Active Directory` > `App registrations`.
+2. Select your app registration.
+3. Choose `Certificates & secrets`.
+4. Select `Upload certificate` and upload the `.cer` file created above.
+
+After upload, Azure AD will display the certificate thumbprint.
+
+### 3. Use the certificate thumbprint in `connection.json`
+
+Use the thumbprint for the certificate that is installed in your local store and uploaded to Azure AD.
+
+```powershell
+Get-ChildItem Cert:\CurrentUser\My | Select-Object Subject, Thumbprint, HasPrivateKey
+```
+
+Then update `connection.json`:
+
+```json
+{
+  "TenantId": "your-tenant-id.onmicrosoft.com",
+  "AppId": "your-app-registration-client-id",
+  "AppSecret": null,
+  "UseCertificate": true,
+  "CertificateThumbprint": "YOUR_CERTIFICATE_THUMBPRINT"
+}
+```
+
+### 4. Required app permissions
+
+The app registration must have the `Exchange.ManageAsApp` application permission for the Office 365 Exchange Online API, and an administrator must grant consent.
+
+## Input list
+
+Use a plain text file or CSV file to provide mailboxes or Microsoft 365 group SMTP addresses.
 
 - Open `certmgr.msc` and check the `Personal\Certificates` store.
 - Select the certificate, open `Details`, then find the `Thumbprint` field.
