@@ -118,13 +118,14 @@ The app registration must have the `Exchange.ManageAsApp` application permission
 
 Use a plain text file or CSV file to provide mailboxes or Microsoft 365 group SMTP addresses.
 
-- Open `certmgr.msc` and check the `Personal\Certificates` store.
-- Select the certificate, open `Details`, then find the `Thumbprint` field.
+- Open `certmgr.msc` and navigate to `Personal\Certificates`.
+- Find the certificate you uploaded for the Azure AD app.
+- View the certificate and note the `Thumbprint` value directly in the list or properties.
 
 Or run in PowerShell:
 
 ```powershell
-Get-ChildItem Cert:\CurrentUser\My | Select-Object Subject, Thumbprint
+Get-ChildItem Cert:\CurrentUser\My | Select-Object Subject, Thumbprint, HasPrivateKey
 ```
 
 Copy the printed thumbprint value into `connection.json`.
