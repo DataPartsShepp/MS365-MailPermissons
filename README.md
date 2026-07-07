@@ -11,22 +11,30 @@ This repository contains a PowerShell script to connect to Microsoft 365 via app
 ## Prerequisites
 
 - PowerShell 7.x or later is recommended, but Windows PowerShell 5.1 works if `ExchangeOnlineManagement` and `ImportExcel` modules are supported.
-- An Azure AD app registration with Exchange Online app-only permission and either:
-  - client secret (`AppSecret`), or
+- An Azure AD app registration with Exchange Online app-only permission and certificate authentication:
   - certificate thumbprint (`CertificateThumbprint`) when `UseCertificate` is set to `true`
+  - client secret (`AppSecret`) may work only if your installed `ExchangeOnlineManagement` module supports it, but certificate auth is recommended
 - `ExchangeOnlineManagement` PowerShell module
 - `ImportExcel` PowerShell module
 
 The script installs missing modules automatically if they are not already present.
 
+> Note: `ExchangeOnlineManagement` 3.x and later no longer supports app secret authentication via `AppSecret`/`ClientSecret` for app-only Exchange Online connections. Certificate auth is the supported and recommended option.
+
 ### Required app permissions
 
-The app registration must be granted the following application permissions in Azure AD / Microsoft Graph, then admin consent must be granted:
+The app registration must be granted app-only permissions for Exchange Online and should be consented by an administrator.
 
-- `Exchange.ManageAsApp` (for app-only access to Exchange Online mailboxes and group mailboxes)
-- `Group.Read.All` or equivalent Microsoft Graph permissions to read unified group membership and owners, if using group mailbox support
+- `Exchange.ManageAsApp` for the **Office 365 Exchange Online** API (not Microsoft Graph)
 
-In addition, the app registration needs Azure AD admin consent so the script can authenticate app-only and query mailbox/group data without interactive sign-in.
+This permission is found under:
+- Azure AD > App registrations > your app > API permissions > Add a permission
+- Select `Office 365 Exchange Online` (or `Exchange`), then `Application permissions`
+- Choose `Exchange.ManageAsApp`
+
+Admin consent must be granted for the permission so the script can authenticate app-only and query mailbox/group data without interactive sign-in.
+
+> Note: This script uses Exchange Online cmdlets such as `Connect-ExchangeOnline`, `Get-Mailbox`, `Get-UnifiedGroup`, and `Get-UnifiedGroupLinks`, so Graph permissions are not required for the current implementation.
 
 ## Configuration
 
@@ -36,13 +44,13 @@ Create or update `connection.json` with your tenant and app credentials:
 {
   "TenantId": "your-tenant-id.onmicrosoft.com",
   "AppId": "your-app-registration-client-id",
-  "AppSecret": "your-app-secret",
-  "UseCertificate": false,
-  "CertificateThumbprint": null
+  "AppSecret": null,
+  "UseCertificate": true,
+  "CertificateThumbprint": "your-certificate-thumbprint"
 }
 ```
 
-If using certificate auth, set `UseCertificate` to `true` and provide `CertificateThumbprint`.
+This example uses certificate auth, which is the recommended method for current ExchangeOnlineManagement module versions.
 
 ## Input list
 
