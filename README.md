@@ -52,6 +52,21 @@ Create or update `connection.json` with your tenant and app credentials:
 
 This example uses certificate auth, which is the recommended method for current ExchangeOnlineManagement module versions.
 
+### Finding your certificate thumbprint
+
+Use the Windows certificate manager or PowerShell to locate the cert thumbprint:
+
+- Open `certmgr.msc` and check the `Personal\Certificates` store.
+- Select the certificate, open `Details`, then find the `Thumbprint` field.
+
+Or run in PowerShell:
+
+```powershell
+Get-ChildItem Cert:\CurrentUser\My | Select-Object Subject, Thumbprint
+```
+
+Copy the printed thumbprint value into `connection.json`.
+
 ## Input list
 
 Use a plain text file or CSV file to provide mailboxes or Microsoft 365 group SMTP addresses.
