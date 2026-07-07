@@ -72,11 +72,12 @@ $cert = New-SelfSignedCertificate \
   -CertStoreLocation Cert:\CurrentUser\My \
   -KeyExportPolicy Exportable \
   -KeySpec Signature \
-  -Provider "Microsoft Software Key Storage Provider" \
   -NotAfter (Get-Date).AddYears(2)
 
 Export-Certificate -Cert $cert -FilePath .\MS365-MailPermissions.cer
 ```
+
+If you see an error like `Provider type not defined`, it means your system does not support the explicit provider name. Omit `-Provider` and use the default provider instead.
 
 This creates a certificate with a private key in `Cert:\CurrentUser\My` and exports the public certificate to `MS365-MailPermissions.cer`.
 
