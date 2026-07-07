@@ -97,6 +97,24 @@ function Load-Config {
     return $json
 }
 
+function Get-ConnectExchangeOnlineSecretParameterName {
+    try {
+        $cmd = Get-Command Connect-ExchangeOnline -ErrorAction Stop
+    } catch {
+        throw "Connect-ExchangeOnline is not available. Ensure the ExchangeOnlineManagement module is loaded."
+    }
+
+    if ($cmd.Parameters.ContainsKey('ClientSecret')) {
+        return 'ClientSecret'
+    }
+
+    if ($cmd.Parameters.ContainsKey('AppSecret')) {
+        return 'AppSecret'
+    }
+
+    return $null
+}
+
 function Connect-ExchangeOnlineFromConfig {
     param(
         $Config
@@ -114,7 +132,25 @@ function Connect-ExchangeOnlineFromConfig {
     if ($Config.UseCertificate -eq $true -and $Config.CertificateThumbprint) {
         $connectParams.CertificateThumbprint = $Config.CertificateThumbprint
     } elseif ($Config.AppSecret) {
-        $connectParams.AppSecret = $Config.AppSecret
+        $secretParam = Get-ConnectExchangeOnlineSecretParameterName
+        if (-not $secretParam) {
+            Write-Host "Installed ExchangeOnlineManagement module does not support app-secret authentication. Attempting to update the module..." -ForegroundColor Yellow
+            try {
+                Ensure-PSGallery
+                Install-Module -Name ExchangeOnlineManagement -Scope CurrentUser -Force -AllowClobber -ErrorAction Stop
+                Import-Module ExchangeOnlineManagement -Force -ErrorAction Stop
+                $secretParam = Get-ConnectExchangeOnlineSecretParameterName
+            } catch {
+                Write-Warning "Automatic update failed: $_"
+                $secretParam = $null
+            }
+        }
+
+        if ($secretParam) {
+            $connectParams[$secretParam] = $Config.AppSecret
+        } else {
+            throw "The installed ExchangeOnlineManagement module does not support app-secret authentication. Update the module manually or use certificate auth. Run: Install-Module ExchangeOnlineManagement -Scope CurrentUser -Force -AllowClobber"
+        }
     } else {
         throw "Config must specify AppSecret or CertificateThumbprint for app-only authentication."
     }
