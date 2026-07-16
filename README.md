@@ -9,8 +9,9 @@ This repository contains a PowerShell script to connect to Microsoft 365 via app
 - `connection.example.json` - generic example configuration
 - `connection.certificate.example.json` - certificate-based configuration example
 - `emails.txt` - sample mailbox list
+- `README.md` - setup, usage, and repository notes
 
-> `connection.json` and `emails.txt` are ignored by `.gitignore` to avoid committing secrets and local data.
+> `connection.json`, `emails.txt`, and the generated workbook `MailboxPermissionsReport.xlsx` are ignored by `.gitignore` so local secrets and report output stay out of source control.
 
 ## Prerequisites
 
@@ -170,6 +171,8 @@ The script writes permission data to an Excel workbook with the following worksh
 - `MailboxPermissions` - mailbox-level access entries
 - `FolderPermissions` - folder-level access entries for common folders
 - `GroupPermissions` - Microsoft 365 group membership and owner details
+
+By default, the workbook is written to `MailboxPermissionsReport.xlsx` in the repository root. That file is ignored locally by `.gitignore` so the generated report does not appear in Git changes.
 
 ## Notes
 
